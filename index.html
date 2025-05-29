@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Phoenix - ระบบจัดการทีม</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        /* Main Dashboard */
+        .main-screen {
+            display: none;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2196F3;
+            font-size: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rank-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .super-admin { background: linear-gradient(45deg, #FF1744, #FF6B35); color: white; animation: glow 2s infinite alternate; }
+        .coach-master { background: linear-gradient(45deg, #FFD700, #FFA500); color: #333; }
+        .coach { background: linear-gradient(45deg, #C0C0C0, #A0A0A0); color: #333; }
+        .captain { background: linear-gradient(45deg, #CD7F32, #8B4513); color: white; }
+        .member { background: linear-gradient(45deg, #87CEEB, #4682B4); color: white; }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(255, 23, 68, 0.5); }
+            to { box-shadow: 0 0 30px rgba(255, 23, 68, 0.8); }
+        }
+
+        .sound-toggle {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196f3;
+            color: #2196f3;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sound-toggle:hover {
+            background: #2196f3;
+            color: white;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+        }
+
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+
+        .attendance-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .attendance-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .check-in {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .check-out {
+            background: linear-gradient(45deg, #f44336, #da190b);
+            color: white;
+        }
+
+        .attendance-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .schedule-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .player-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(33, 150, 243, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .player-card:hover::before {
+            left: 100%;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .player-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .online-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        .notification-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-item {
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            background: rgba(33, 150, 243, 0.1);
+            margin-bottom: 10px;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover {
+            background: rgba(33, 150, 243, 0.2);
+            transform: translateX(5px);
+        }
+
+        .coach-panel {
+            display: none;
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            min-width: 400px;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-modal:hover {
+            color: #f44336;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(33, 150, 243, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .nav-tabs {
+                justify-content: center;
+            }
+            
+            .attendance-section {
+                flex-direction: column;
+            }
+            
+            .login-box {
+                min-width: 90%;
+                padding: 30px 20px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="logo">⚡ PROJECT ESPORTS STY</div>
+            <p style="color: #666; margin-bottom: 30px;">ระบบจัดการทีมอีสปอร
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <input type="text" id="username" placeholder="ชื่อผู้ใช้" required>
+                <input type="password" id="password" placeholder="รหัสผ่าน" required>
+                <button type="submit" class="btn">เข้าสู่ระบบ</button>
+            </form>
+            <p style="margin-top: 20px; font-size: 12px; color: #999;">
+                Demo: Ratchanon1122/admin123 (Super Admin) | admin/admin123 (Coach Master) | user1/password (Member)
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainScreen" class="main-screen">
+        <div class="container">
+            <!-- Header -->
+            <header class="header">
+                <h1>🔥 TEAM PHOENIX</h1>
+                <div class="user-info">
+                    <span id="userRole" class="rank-badge"></span>
+                    <span id="userName" style="font-weight: bold;"></span>
+                    <button class="sound-toggle" onclick="toggleSound()" title="เปิด/ปิดเสียง">
+                        🔊
+                    </button>
+                    <button class="btn" onclick="logout()" style="padding: 8px 15px; font-size: 14px;">ออกจากระบบ</button>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('dashboard')">หน้าหลัก</button>
+                <button class="nav-tab" onclick="showTab('attendance')">เช็คชื่อ</button>
+                <button class="nav-tab" onclick="showTab('schedule')">ตารางซ้อม</button>
+                <button class="nav-tab" onclick="showTab('team')">ทีมงาน</button>
+                <button class="nav-tab" onclick="showTab('profile')">โปรไฟล์</button>
+                <button id="coachTab" class="nav-tab hidden" onclick="showTab('coach')">จัดการทีม</button>
+                <button id="superAdminTab" class="nav-tab hidden" onclick="showTab('superadmin')">ระบบหลักฐาน</button>
+            </nav>
+
+            <!-- Notification Panel -->
+            <div class="notification-panel">
+                <h3 style="color: #2196F3; margin-bottom: 15px;">📢 ประกาศล่าสุด</h3>
+                <div class="notification-item">
+                    <strong>การแข่งขันรอบชิงชนะเลิศ</strong><br>
+                    วันที่ 15 มิถุนายน 2025 เวลา 19:00 น. ขอให้ทุกคนเตรียมตัวให้พร้อม!
+                </div>
+                <div class="notification-item">
+                    <strong>การซ้อมพิเศษ</strong><br>
+                    วันศุกร์นี้ เพิ่มเซสชั่นซ้อมพิเศษ เวลา 20:00-22:00 น.
+                </div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="content-section">
+                <h2 style="color: #2196F3; margin-bottom: 20px;">📊 ภาพรวมทีม</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div>สมาชิกทั้งหมด</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div>ออนไลน์</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div>การแข่งขันสัปดาห์นี้</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">85%</div>
+                        <div>อัตราเข้าซ้อม</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Tab -->
+            <div id="attendanceTab" class="content-section hidden">
+                <h2 style="color: #2196F3; margin-bottom: 20px;">✅ ระบบเช็ครายชื่อ</h2>
+                <div class="attendance-section">
+                    <button class="attendance-btn check-in" onclick="checkIn()">
+                        🟢 เข้าซ้อม
+                    </button>
+                    <button class="attendance-btn check-out" onclick="checkOut()">
+                        🔴 ออกซ้อม
+                    </button>
+                </div>
+                <div id="attendanceStatus" style="text-align: center; font-size: 18px; font-weight: bold; color: #666;">
+                    สถานะ: ยังไม่ได้เช็คชื่อ
+                </div>
+            </div>
+
+            <!-- Schedule Tab -->
+            <div id="scheduleTab" class="content-section hidden">
+                <h2 style="color: #2196F3; margin-bottom: 20px;">📅 ตารางซ้อมทีม</h2>
+                <div class="schedule-grid">
+                    <div class="schedule-card">
+                        <h3>จันทร์</h3>
+                        <p><strong>19:00 - 21:00</strong></p>
+                        <p>ซ้อมกลยุทธ์และทีมเวิร์ค</p>
+                    </div>
+                    <div class="schedule-card">
+                        <h3>พุธ</h3>
+                        <p><strong>19:30 - 22:00</strong></p>
+                        <p>ซ้อมเทคนิคเฉพาะตำแหน่ง</p>
+                    </div>
+                    <div class="schedule-card">
+                        <h3>ศุกร์</h3>
+                        <p><strong>20:00 - 23:00</strong></p>
+                        <p>Scrim Match และทบทวน</p>
+                    </div>
+                    <div class="schedule-card">
+                        <h3>อาทิตย์</h3>
+                        <p><strong>18:00 - 20:00</strong></p>
+                        <p>การแข่งขันทีม</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Tab -->
+            <div id="teamTab" class="content-section hidden">
+                <h2 style="color: #2196F3; margin-bottom: 20px;">👥 สมาชิกทีม</h2>
+                <div class="team-grid">
+                    <div class="player-card">
+                        <div class="online-indicator"></div>
+                        <div class="player-avatar">A</div>
+                        <h3>Phoenix_Admin</h3>
+                        <span class="rank-badge coach-master">Coach Master</span>
+                        <p style="margin-top: 10px; color: #666;">ผู้จัดการทีม</p>
+                    </div>
+                    <div class="player-card">
+                        <div class="online-indicator"></div>
+                        <div class="player-avatar">C</div>
+                        <h3>Coach_Fire</h3>
+                        <span class="rank-badge coach">Coach</span>
+                        <p style="margin-top: 10px; color: #666;">หัวหน้าโค้ช</p>
+                    </div>
+                    <div class="player-card">
+                        <div class="online-indicator"></div>
+                        <div class="player-avatar">P</div>
+                        <h3>Phoenix_Player1</h3>
+                        <span class="rank-badge captain">Captain</span>
+                        <p style="margin-top: 10px; color: #666;">หัวหน้าทีม</p>
+                    </div>
+                    <div class="player-card">
+                        <div class="player-avatar">M</div>
+                        <h3>Member_01</h3>
+                        <span class="rank-badge member">Member</span>
+                        <p style="margin-top: 10px; color: #666;">นักแข่ง</p>
+                    </div>
+                    <div class="player-card">
+                        <div class="online-indicator"></div>
+                        <div class="player-avatar">M</div>
+                        <h3>Member_02</h3>
+                        <span class="rank-badge member">Member</span>
+                        <p style="margin-top: 10px; color: #666;">นักแข่ง</p>
+                    </div>
+                    <div class="player-card">
+                        <div class="player-avatar">M</div>
+                        <h3>Member_03</h3>
+                        <span class="rank-badge member">Member</span>
+                        <p style="margin-top: 10px; color: #666;">สำรอง</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profileTab" class="content-section hidden">
+                <h2 style="color: #2196F3; margin-bottom: 20px;">👤 โปรไฟล์ส่วนตัว</h2>
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div class="player-card" style="margin-bottom: 20px;">
+                        <div class="player-avatar" style="width: 120px; height: 120px; font-size: 36px;">U</div>
+                        <h2 id="profileName" style="margin: 15px 0;">User</h2>
+                        <span id="profileRole" class="rank-badge member">Member</span>
+                        <div style="margin-top: 20px; text-align: left;">
+                            <p><strong>เข้าร่วมเมื่อ:</strong> 1 มกราคม 2025</p>
+                            <p><strong>การเข้าซ้อมในเดือนนี้:</strong> 15/18 ครั้ง</p>
+                            <p><strong>คะแนนการเข้าร่วม:</strong> 83%</p>
+                            <p><strong>การแข่งขันที่เข้าร่วม:</strong> 8 ครั้ง</p>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="openModal('editProfileModal')" style="width: 100%;">แก้ไขโปรไฟล์</button>
+                </div>
+            </div>
+
+                            <!-- Coach Panel -->
+            <div id="coachTab" class="content-section hidden coach-panel">
+                <h2 style="color: #FFD700; margin-bottom: 20px;">👑 แผงควบคุมโค้ช</h2>
+                
+                <div class="nav-tabs" style="margin-bottom: 20px;">
+                    <button class="nav-tab active" onclick="showCoachTab('members')">จัดการสมาชิก</button>
+                    <button class="nav-tab" onclick="showCoachTab('schedule-manage')">จัดการตาราง</button>
+                    <button class="nav-tab" onclick="showCoachTab('competitions')">การแข่งขัน</button>
+                    <button class="nav-tab" onclick="showCoachTab('requests')">คำขอต่างๆ</button>
+                </div>
+
+                <!-- Members Management -->
+                <div id="coachMembersTab">
+                    <h3 style="margin-bottom: 15px;">รายชื่อสมาชิกและสถานะ</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f5f5f5;">
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">ชื่อ</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">ตำแหน่ง</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">สถานะ</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">การเข้าซ้อม</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Ratchanon1122</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span class="rank-badge super-admin">Super Admin</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span style="color: #4CAF50;">🟢 ออนไลน์</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">18/18</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="viewProfile('Ratchanon1122')">ดูโปรไฟล์</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Phoenix_Admin</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span class="rank-badge coach-master">Coach Master</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span style="color: #4CAF50;">🟢 ออนไลน์</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">16/18</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="viewProfile('Phoenix_Admin')">ดูโปรไฟล์</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Coach_Fire</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span class="rank-badge coach">Coach</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span style="color: #4CAF50;">🟢 ออนไลน์</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">15/18</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="viewProfile('Coach_Fire')">ดูโปรไฟล์</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Phoenix_Player1</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span class="rank-badge captain">Captain</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span style="color: #4CAF50;">🟢 ออนไลน์</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">17/18</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="viewProfile('Phoenix_Player1')">ดูโปรไฟล์</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Schedule Management -->
+                <div id="coachScheduleTab" class="hidden">
+                    <h3 style="margin-bottom: 15px;">จัดการตารางซ้อม</h3>
+                    <button class="btn" onclick="openModal('addScheduleModal')" style="margin-bottom: 20px;">+ เพิ่มตารางซ้อม</button>
+                    <div class="schedule-grid">
+                        <div class="schedule-card">
+                            <h3>จันทร์</h3>
+                            <p><strong>19:00 - 21:00</strong></p>
+                            <p>ซ้อมกลยุทธ์และทีมเวิร์ค</p>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 15px;" onclick="editSchedule('monday')">แก้ไข</button>
+                        </div>
+                        <div class="schedule-card">
+                            <h3>พุธ</h3>
+                            <p><strong>19:30 - 22:00</strong></p>
+                            <p>ซ้อมเทคนิคเฉพาะตำแหน่ง</p>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 15px;" onclick="editSchedule('wednesday')">แก้ไข</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competitions -->
+                <div id="coachCompetitionsTab" class="hidden">
+                    <h3 style="margin-bottom: 15px;">การแข่งขันและรายชื่อผู้ลงแข่ง</h3>
+                    <button class="btn" onclick="openModal('addCompetitionModal')" style="margin-bottom: 20px;">+ เพิ่มการแข่งขัน</button>
+                    <div style="display: grid; gap: 20px;">
+                        <div style="background: white; padding: 20px; border-radius: 10px; border-left: 5px solid #2196F3;">
+                            <h4 style="color: #2196F3;">🏆 Championship Finals</h4>
+                            <p><strong>วันที่:</strong> 15 มิถุนายน 2025</p>
+                            <p><strong>เวลา:</strong> 19:00 - 22:00</p>
+                            <p><strong>ผู้ลงแข่ง:</strong> Phoenix_Player1, Member_01, Member_02, Coach_Fire, Member_03</p>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 15px;" onclick="editCompetition('comp1')">แก้ไข</button>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; border-left: 5px solid #FF9800;">
+                            <h4 style="color: #FF9800;">⚔️ Scrim Match vs Team Alpha</h4>
+                            <p><strong>วันที่:</strong> 2 มิถุนายน 2025</p>
+                            <p><strong>เวลา:</strong> 20:00 - 21:30</p>
+                            <p><strong>ผู้ลงแข่ง:</strong> Phoenix_Player1, Member_01, Member_02, Member_04, Member_05</p>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 15px;" onclick="editCompetition('comp2')">แก้ไข</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requests -->
+                <div id="coachRequestsTab" class="hidden">
+                    <h3 style="margin-bottom: 15px;">คำขอและระบบยื่นเรื่อง</h3>
+                    <div style="display: grid; gap: 15px;">
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 10px; border-left: 5px solid #ffc107;">
+                            <h4>📝 คำขอลา - Member_01</h4>
+                            <p><strong>วันที่:</strong> 5 มิถุนายน 2025</p>
+                            <p><strong>เหตุผล:</strong> มีธุระส่วนตัวฉุกเฉิน</p>
+                            <div style="margin-top: 10px;">
+                                <button class="btn" style="background: #28a745; padding: 5px 15px; margin-right: 10px;" onclick="approveRequest('req1')">อนุมัติ</button>
+                                <button class="btn" style="background: #dc3545; padding: 5px 15px;" onclick="rejectRequest('req1')">ปฏิเสธ</button>
+                            </div>
+                        </div>
+                        <div style="background: #f8d7da; padding: 15px; border-radius: 10px; border-left: 5px solid #dc3545;">
+                            <h4>⚠️ แจ้งปัญหา - Member_02</h4>
+                            <p><strong>วันที่:</strong> 3 มิถุนายน 2025</p>
+                            <p><strong>ปัญหา:</strong> อินเทอร์เน็ตไม่เสถียร ขอความช่วยเหลือ</p>
+                            <div style="margin-top: 10px;">
+                                <button class="btn" style="padding: 5px 15px;" onclick="respondToIssue('issue1')">ตอบกลับ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Super Admin Panel (Ratchanon1122 Only) -->
+            <div id="superadminTab" class="content-section hidden" style="background: rgba(255, 23, 68, 0.05); border: 2px solid #FF1744;">
+                <h2 style="color: #FF1744; margin-bottom: 20px;">🔒 ระบบหลักฐาน - Super Admin</h2>
+                <div style="background: rgba(255, 23, 68, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                    <p style="color: #FF1744; font-weight: bold;">⚠️ เฉพาะ Ratchanon1122 เท่านั้นที่สามารถเข้าถึงได้</p>
+                </div>
+                
+                <div class="nav-tabs" style="margin-bottom: 20px;">
+                    <button class="nav-tab active" onclick="showSuperAdminTab('user-management')">จัดการผู้ใช้</button>
+                    <button class="nav-tab" onclick="showSuperAdminTab('member-profiles')">ประวัติสมาชิก</button>
+                    <button class="nav-tab" onclick="showSuperAdminTab('activities')">กิจกรรม</button>
+                    <button class="nav-tab" onclick="showSuperAdminTab('system-settings')">ตั้งค่าระบบ</button>
+                </div>
+
+                <!-- User Management -->
+                <div id="superUserManagementTab">
+                    <h3 style="margin-bottom: 15px;">จัดการยศและข้อมูลสมาชิก</h3>
+                    <button class="btn" onclick="openModal('addUserModal')" style="margin-bottom: 20px;">+ เพิ่มสมาชิกใหม่</button>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f5f5f5;">
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">ชื่อผู้ใช้</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">ยศปัจจุบัน</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">วันที่เข้าร่วม</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">สถานะ</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Phoenix_Admin</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span class="rank-badge coach-master">Coach Master</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">1 ม.ค. 2025</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span style="color: #4CAF50;">เปิดใช้งาน</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; margin-right: 5px;" onclick="editUserRank('Phoenix_Admin')">แก้ไขยศ</button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: #dc3545;" onclick="toggleUser('Phoenix_Admin')">ระงับ</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Coach_Fire</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span class="rank-badge coach">Coach</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">5 ม.ค. 2025</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;"><span style="color: #4CAF50;">เปิดใช้งาน</span></td>
+                                    <td style="padding: 12px; border: 1px solid #ddd;">
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; margin-right: 5px;" onclick="editUserRank('Coach_Fire')">แก้ไขยศ</button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: #dc3545;" onclick="toggleUser('Coach_Fire')">ระงับ</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Member Profiles -->
+                <div id="superMemberProfilesTab" class="hidden">
+                    <h3 style="margin-bottom: 15px;">ประวัติส่วนตัวสมาชิก</h3>
+                    <div style="display: grid; gap: 20px;">
+                        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="color: #2196F3;">👤 Phoenix_Player1</h4>
+                                <span class="rank-badge captain">Captain</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <p><strong>ชื่อจริง:</strong> นายสมชาย ใจดี</p>
+                                    <p><strong>อายุ:</strong> 22 ปี</p>
+                                    <p><strong>เบอร์โทร:</strong> 081-234-5678</p>
+                                </div>
+                                <div>
+                                    <p><strong>อีเมล:</strong> player1@email.com</p>
+                                    <p><strong>Discord:</strong> Phoenix_Player1#1234</p>
+                                    <p><strong>เข้าร่วมเมื่อ:</strong> 10 ม.ค. 2025</p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                                <p><strong>สถิติการเข้าร่วม:</strong> 17/18 ครั้ง (94%)</p>
+                                <p><strong>การแข่งขันที่เข้าร่วม:</strong> 12 ครั้ง</p>
+                                <p><strong>บันทึกเพิ่มเติม:</strong> ผู้เล่นที่มีประสบการณ์สูง เป็นหัวหน้าทีมที่ดี</p>
+                            </div>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 15px;" onclick="editMemberProfile('Phoenix_Player1')">แก้ไขข้อมูล</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activities -->
+                <div id="superActivitiesTab" class="hidden">
+                    <h3 style="margin-bottom: 15px;">กิจกรรมและประชุม</h3>
+                    <button class="btn" onclick="openModal('addActivityModal')" style="margin-bottom: 20px;">+ เพิ่มกิจกรรม</button>
+                    <div style="display: grid; gap: 15px;">
+                        <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; border-left: 5px solid #2196F3;">
+                            <h4 style="color: #1976d2;">📅 ประชุมทีม - วางแผนการแข่งขัน</h4>
+                            <p><strong>วันที่:</strong> 8 มิถุนายน 2025</p>
+                            <p><strong>เวลา:</strong> 20:00 - 21:30</p>
+                            <p><strong>สถานที่:</strong> Discord Voice Channel</p>
+                            <p><strong>ผู้เข้าร่วม:</strong> ทุกสมาชิก (บังคับ)</p>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 15px;" onclick="editActivity('activity1')">แก้ไข</button>
+                        </div>
+                        <div style="background: #f3e5f5; padding: 15px; border-radius: 10px; border-left: 5px solid #9c27b0;">
+                            <h4 style="color: #7b1fa2;">🎉 Team Building Event</h4>
+                            <p><strong>วันที่:</strong> 12 มิถุนายน 2025</p>
+                            <p><strong>เวลา:</strong> 14:00 - 18:00</p>
+                            <p><strong>สถานที่:</strong> Café Gaming Hub</p>
+                            <p><strong>ผู้เข้าร่วม:</strong> สมัครใจ</p>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 15px;" onclick="editActivity('activity2')">แก้ไข</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings -->
+                <div id="superSystemSettingsTab" class="hidden">
+                    <h3 style="margin-bottom: 15px;">ตั้งค่าระบบ</h3>
+                    <div style="display: grid; gap: 20px;">
+                        <div style="background: white; padding: 20px; border-radius: 10px;">
+                            <h4 style="margin-bottom: 15px;">การแจ้งเตือน</h4>
+                            <div class="form-group">
+                                <label>เซิร์ฟเวอร์ Discord:</label>
+                                <input type="text" value="PROJECT ESPORTS STY Server" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>SMTP Email Server:</label>
+                                <input type="text" value="smtp.gmail.com" readonly>
+                            </div>
+                            <button class="btn" onclick="testNotifications()">ทดสอบการแจ้งเตือน</button>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px;">
+                            <h4 style="margin-bottom: 15px;">สำรองข้อมูล</h4>
+                            <p style="margin-bottom: 15px;">การสำรองข้อมูลล่าสุด: 29 พ.ค. 2025 เวลา 03:00</p>
+                            <button class="btn" onclick="backupData()" style="margin-right: 10px;">สำรองข้อมูลตนอน</button>
+                            <button class="btn" onclick="downloadBackup()" style="background: #28a745;">ดาวน์โหลดข้อมูล</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
